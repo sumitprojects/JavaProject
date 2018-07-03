@@ -14,7 +14,7 @@
                         out.print(exception.getMessage());
                     }else{
                         //int a = response.getStatus();
-                        response.sendError(404,"Guru Page Not Found");
+                        response.sendError(404,"Page Not Found");
                     }
                     
                      %><br/> </h2>
