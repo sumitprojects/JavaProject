@@ -77,7 +77,7 @@ public class ControllerServlet extends HttpServlet {
         String data = request.getParameter("booksearch");
         StringBuilder sb = new StringBuilder();
         PrintWriter out = response.getWriter();
-        response.setContentType("text/xml");
+        response.setContentType("text/html");
         response.setHeader("Cache-Control", "no-cache");
 
         if (!"".equals(data)) {

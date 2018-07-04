@@ -91,34 +91,6 @@ public class BookDAO {
         return listBook;
     }
 
-    public List<Book> listBooks(String data) throws SQLException {
-        List<Book> listBook = new ArrayList<>();
-
-        String sql = "SELECT * FROM book where title LIKE '%?%' OR author = '%?%'";
-
-        connect();
-
-        PreparedStatement statement = jdbcConnection.prepareStatement(sql);
-        statement.setString(1, data);
-        statement.setString(2, data);
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet.next()) {
-            int id = resultSet.getInt("book_id");
-            String title = resultSet.getString("title");
-            String author = resultSet.getString("author");
-            float price = resultSet.getFloat("price");
-
-            Book book = new Book(id, title, author, price);
-            book.toString();
-            listBook.add(book);
-        }
-
-        disconnect();
-
-        return listBook;
-    }
-
     public boolean deleteBook(Book book) throws SQLException {
         String sql = "DELETE FROM book where book_id = ?";
 
