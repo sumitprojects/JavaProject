@@ -1,4 +1,4 @@
-REATE TABLE `book` (
+CREATE TABLE `book` (
   `book_id` int(11) NOT NULL,
   `title` varchar(128) NOT NULL,
   `author` varchar(45) NOT NULL,
