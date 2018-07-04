@@ -19,24 +19,24 @@ import javax.servlet.http.HttpServletResponse;
  * @author www.codejava.net
  */
 public class ControllerServlet extends HttpServlet {
-
+    
     private static final long serialVersionUID = 1L;
     private BookDAO bookDAO;
-
+    
     public void init() {
         String jdbcURL = getServletContext().getInitParameter("jdbcURL");
         String jdbcUsername = getServletContext().getInitParameter("jdbcUsername");
         String jdbcPassword = getServletContext().getInitParameter("jdbcPassword");
-
+        
         bookDAO = new BookDAO(jdbcURL, jdbcUsername, jdbcPassword);
-
+        
     }
-
+    
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
     }
-
+    
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getServletPath();
@@ -59,7 +59,11 @@ public class ControllerServlet extends HttpServlet {
                     updateBook(request, response);
                     break;
                 case "/getbook":
-                    getBookSuggetion(request, response);
+                    if (!"".equals(data)) {
+                        getBookSuggetion(request, response);
+                    } else {                        
+                        getAllBooks(request, response);
+                    }
                     break;
                 default:
                     listBook(request, response);
@@ -69,19 +73,40 @@ public class ControllerServlet extends HttpServlet {
             throw new ServletException(ex);
         }
     }
-
+    
     private void getBookSuggetion(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
         String data = request.getParameter("booksearch");
         StringBuilder sb = new StringBuilder();
         PrintWriter out = response.getWriter();
         response.setContentType("text/html");
-        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("Cache-Control", "no-cache");        
+        List<Book> newlist = bookDAO.listAllBooks().stream()
+                .filter(datas -> datas.getAuthor().contains(data) || datas.getTitle().contains(data)).
+                collect(Collectors.toList());
+        for (Book book : newlist) {
+            out.print("<tr><td>");
+            out.print(book.getId());
+            out.print("</td><td>");
+            out.print(book.getTitle());
+            out.print("</td><td>");
+            out.print(book.getAuthor());
+            out.print("</td><td>");
+            out.print(book.getPrice());
+            out.print("</td><td><a href='edit?id=" + book.getId() + "'>Edit</a>"
+                    + "&nbsp;&nbsp;&nbsp;&nbsp;" + "<a href='edit?id=" + book.getId() + "'>Delete</a></td></tr>");
+        }
+        out.close();
+    }
 
-        if (!"".equals(data)) {
-            List<Book> newlist = bookDAO.listAllBooks().stream()
-                    .filter(datas->datas.getAuthor().contains(data) || datas.getTitle().contains(data)).
-                    collect(Collectors.toList());
+    private void getAllBooks(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        //String data = request.getParameter("booksearch");
+        StringBuilder sb = new StringBuilder();
+        PrintWriter out = response.getWriter();
+        response.setContentType("text/html");
+        response.setHeader("Cache-Control", "no-cache");        
+        List<Book> newlist = bookDAO.listAllBooks();
             for (Book book : newlist) {
                 out.print("<tr><td>");
                 out.print(book.getId());
@@ -91,10 +116,9 @@ public class ControllerServlet extends HttpServlet {
                 out.print(book.getAuthor());
                 out.print("</td><td>");
                 out.print(book.getPrice());
-                out.print("</td><td><a href='edit?id="+book.getId()+"'>Edit</a>" +
-                        "&nbsp;&nbsp;&nbsp;&nbsp;" +"<a href='edit?id="+book.getId()+"'>Delete</a></td></tr>");
+                out.print("</td><td><a href='edit?id=" + book.getId() + "'>Edit</a>"
+                        + "&nbsp;&nbsp;&nbsp;&nbsp;" + "<a href='edit?id=" + book.getId() + "'>Delete</a></td></tr>");
             }
-        }
         out.close();
     }
 
@@ -105,13 +129,13 @@ public class ControllerServlet extends HttpServlet {
         RequestDispatcher dispatcher = request.getRequestDispatcher("bookstore.jsp");
         dispatcher.forward(request, response);
     }
-
+    
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
         dispatcher.forward(request, response);
     }
-
+    
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
@@ -119,40 +143,40 @@ public class ControllerServlet extends HttpServlet {
         RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
         request.setAttribute("book", existingBook);
         dispatcher.forward(request, response);
-
+        
     }
-
+    
     private void insertBook(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         String title = request.getParameter("title");
         String author = request.getParameter("author");
         float price = Float.parseFloat(request.getParameter("price"));
-
+        
         Book newBook = new Book(title, author, price);
         bookDAO.insertBook(newBook);
         response.sendRedirect("list");
     }
-
+    
     private void updateBook(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         String title = request.getParameter("title");
         String author = request.getParameter("author");
         float price = Float.parseFloat(request.getParameter("price"));
-
+        
         Book book = new Book(id, title, author, price);
         bookDAO.updateBook(book);
         response.sendRedirect("list");
     }
-
+    
     private void deleteBook(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-
+        
         Book book = new Book(id);
         bookDAO.deleteBook(book);
         response.sendRedirect("list");
-
+        
     }
-
+    
 }
