@@ -61,7 +61,6 @@ https://maps.googleapis.com/maps/api/geocode/xml?address=1600+Amphitheatre+Parkw
                                 txt += "<td>" + x[0].childNodes[0].nodeValue + "</td>";
                                 x = xmlDoc.getElementsByTagName("lng");
                                 txt += "<td>" + x[0].childNodes[0].nodeValue + "</td>";
-
                                 document.getElementById("datatable").innerHTML = txt;
                                 console.log(txt);
                             }
