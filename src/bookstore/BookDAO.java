@@ -91,6 +91,34 @@ public class BookDAO {
         return listBook;
     }
 
+    /**
+     *
+     * @param name
+     * @param col
+     * @throws SQLException
+     */
+    public void listAllData(String name,String[] col) throws SQLException {
+       
+        String sql = "SELECT ? FROM ?";
+
+        connect();
+        try {
+            PreparedStatement statement = jdbcConnection.prepareStatement(sql);
+                statement.setString(1, String.join(",", col));
+                statement.setString(2, name);
+                ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                for (String string : col) {
+                    System.out.println(resultSet.getString(string));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }finally{
+            disconnect();
+        }
+    }
     public boolean deleteBook(Book book) throws SQLException {
         String sql = "DELETE FROM book where book_id = ?";
 
