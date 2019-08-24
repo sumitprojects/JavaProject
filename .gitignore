@@ -2,3 +2,6 @@
 /newweb/build/
 /struts/nbproject/private/
 /struts/build/
+target
+tomcat.5000/
+tomcat.8080/
